@@ -19,14 +19,12 @@ userRouter.get('/', async (req: Request, res: Response): Promise<Response> => {
   return await UserService.getUsers(startAt, res);
 });
 
-userRouter.post('/', async (req: Request, res: Response) => {
+userRouter.post('/', async (req: Request, res: Response): Promise<Response> => {
   const missingFields = getMissingFields(User.fields, Object.keys(req.body));
 
   if (missingFields.length > 0) {
     return RestResponse.ValidationFail(missingFields, res);
   }
 
-  const user = await addPrismaUser(req.body.name, req.body.age);
-
-  return RestResponse.OkWithData('User added successfully', user, res);
+  return await UserService.addUser(req, res);
 });

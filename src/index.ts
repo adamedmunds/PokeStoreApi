@@ -1,6 +1,6 @@
 import bodyParser from 'body-parser';
 import express, { Express } from 'express';
-import { userRouter } from './Controllers/UserController';
+import { userRouter } from './Controllers';
 
 const app: Express = express();
 
