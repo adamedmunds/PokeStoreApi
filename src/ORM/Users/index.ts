@@ -1,2 +1,2 @@
-export { addPrismaUser } from './addPrismaUser';
-export { getPrismaUsers } from './getPrismaUsers';
+export { addUser } from './addUser';
+export { getUsers } from './getUsers';

@@ -1,5 +1,5 @@
 import { createClient } from 'redis';
-import { UserType } from '../Types/User';
+import { User } from '../Types/User';
 
 export class RedisService {
   static async createClient() {
@@ -27,7 +27,7 @@ export class RedisService {
     });
   }
 
-  static async hSet(key: string, value: UserType) {
+  static async hSet(key: string, value: User) {
     const client = await this.createClient();
     client.hSet(key, value).then(() => {
       client.disconnect();
