@@ -1,5 +1,6 @@
 import { createClient } from 'redis';
 import { User } from '../Types/User';
+import { Pokemon } from '../Types/Pokemon';
 
 export class RedisService {
   static async createClient() {
@@ -22,22 +23,8 @@ export class RedisService {
 
   static async get(key: string) {
     const client = await this.createClient();
-    client.get(key).then(() => {
-      client.disconnect();
-    });
-  }
-
-  static async hSet(key: string, value: User) {
-    const client = await this.createClient();
-    client.hSet(key, value).then(() => {
-      client.disconnect();
-    });
-  }
-
-  static async hGet(key: string) {
-    const client = await this.createClient();
-    client.hGetAll(key).then(() => {
-      client.disconnect();
-    });
+    const data = await client.get(key);
+    client.disconnect();
+    return data;
   }
 }

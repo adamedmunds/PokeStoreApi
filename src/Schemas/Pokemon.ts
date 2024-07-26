@@ -1,4 +1,5 @@
 import mongoose from 'mongoose';
+import { Pokemon } from '../Types/Pokemon';
 
 const { Schema } = mongoose;
 
@@ -71,7 +72,7 @@ const Cries = {
   legacy: String,
 };
 
-export const pokemonSchema = new Schema({
+export const pokemonSchema = new Schema<Pokemon>({
   id: Number,
   name: String,
   base_experience: Number,
