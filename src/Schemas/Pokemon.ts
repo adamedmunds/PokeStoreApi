@@ -48,7 +48,7 @@ const Stat = {
 
 const PokemonType = {
   slot: Number,
-  type: GenericApiResponse,
+  type: { type: GenericApiResponse },
 };
 
 const PastType = {
