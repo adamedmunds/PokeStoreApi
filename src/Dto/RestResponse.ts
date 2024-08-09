@@ -1,16 +1,16 @@
 import { Response } from 'express';
-import { StatusCode } from '../Enums/statusCode';
+import { StatusCodes } from '../Enums/statusCodes';
 
 export class RestResponse {
   message: string;
-  status: StatusCode;
+  status: StatusCodes;
   errors: undefined | string[];
   data: any;
   response: Response;
 
   constructor(
     message: string,
-    status: StatusCode,
+    status: StatusCodes,
     errors: string[] | undefined = undefined,
     data: any = undefined,
     response: Response
@@ -30,7 +30,7 @@ export class RestResponse {
   static Ok(message: string, res: Response): Response {
     const object = new RestResponse(
       message,
-      StatusCode.OK,
+      StatusCodes.OK,
       undefined,
       undefined,
       res
@@ -41,7 +41,7 @@ export class RestResponse {
   static OkWithData(message: string, data: any, res: Response): Response {
     const object = new RestResponse(
       message,
-      StatusCode.OK,
+      StatusCodes.OK,
       undefined,
       data,
       res
@@ -49,14 +49,18 @@ export class RestResponse {
     return this.Send(object);
   }
 
-  static Success(message: string, status: StatusCode, res: Response): Response {
+  static Success(
+    message: string,
+    status: StatusCodes,
+    res: Response
+  ): Response {
     const object = new RestResponse(message, status, undefined, undefined, res);
     return this.Send(object);
   }
 
   static Fail(
     message: string,
-    status: StatusCode,
+    status: StatusCodes,
     errors: string[],
     res: Response
   ): Response {
@@ -67,7 +71,7 @@ export class RestResponse {
   static ValidationFail(errors: string[], res: Response): Response {
     const object = new RestResponse(
       'Validation error',
-      StatusCode.BAD_REQUEST,
+      StatusCodes.BAD_REQUEST,
       errors,
       undefined,
       res

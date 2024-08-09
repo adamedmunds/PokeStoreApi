@@ -27,4 +27,22 @@ export class RedisService {
     client.disconnect();
     return data;
   }
+
+  static async addPokemon(key: string, value: Pokemon) {
+    const client = await this.createClient();
+    client.set(key, JSON.stringify(value)).then(() => {
+      client.disconnect();
+    });
+  }
+
+  static async getPokemon(key: string): Promise<Pokemon> {
+    const client = await this.createClient();
+    const data = await client.get(key);
+    if (data === null) {
+      throw new Error(`Pokemon data with key: ${key} doesn't exist`)
+    }
+    const returnData = JSON.parse(data);
+    await client.disconnect();
+    return returnData;
+  }
 }
