@@ -1,10 +1,10 @@
-import express, { Request, Response } from 'express';
+import { Request, Response, Router } from 'express';
 import { RestResponse } from '../Dto/RestResponse';
 import { userSchema } from '../Schemas/User';
 import { UserService } from '../Services/UserService';
 import { getMissingFields } from '../Utils/getMissingFields';
 
-export const userRouter = express.Router();
+export const userRouter = Router();
 
 userRouter.get('/', async (req: Request, res: Response): Promise<Response> => {
   return await UserService.getUsers(res);

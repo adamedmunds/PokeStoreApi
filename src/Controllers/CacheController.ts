@@ -1,8 +1,8 @@
-import express, { Request, Response } from 'express';
+import { Request, Response, Router } from 'express';
 import { StatusCodes } from '../Enums/statusCodes';
 import { CacheManager } from '../Services/CacheManagerService';
 
-export const cacheRouter = express.Router();
+export const cacheRouter = Router();
 
 cacheRouter.get('/:id', async (req: Request, res: Response) => {
   const pokemonAccessCount = CacheManager.getPokemonAccessCount(req.params.id);

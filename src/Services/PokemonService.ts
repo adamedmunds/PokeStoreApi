@@ -7,6 +7,8 @@ import { Pokemon } from '../Types/Pokemon';
 import { CacheManager } from './CacheManagerService';
 import { RedisService } from './RedisService';
 
+const REDIS_ACCESS_COUNT = 4;
+
 export class PokemonService {
   static async getPokemon(req: Request, res: Response): Promise<Response> {
     const pokemonId = req.params.id;
@@ -26,7 +28,7 @@ export class PokemonService {
     const pokemon = await PokemonModel.findOne({ id: pokemonId });
     if (pokemon) {
       const accessCount = CacheManager.updatePokemon(pokemonId);
-      if (accessCount >= 5) {
+      if (accessCount >= REDIS_ACCESS_COUNT) {
         RedisService.addPokemon(redisKey, pokemon);
       }
       return RestResponse.OkWithData(

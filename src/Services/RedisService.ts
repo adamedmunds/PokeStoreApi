@@ -35,11 +35,11 @@ export class RedisService {
     });
   }
 
-  static async getPokemon(key: string): Promise<Pokemon> {
+  static async getPokemon(key: string): Promise<Pokemon | null> {
     const client = await this.createClient();
     const data = await client.get(key);
     if (data === null) {
-      throw new Error(`Pokemon data with key: ${key} doesn't exist`)
+      return null;
     }
     const returnData = JSON.parse(data);
     await client.disconnect();
