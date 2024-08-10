@@ -6,7 +6,7 @@ import { getMissingFields } from '../Utils/getMissingFields';
 
 export const userRouter = Router();
 
-userRouter.get('/', async (req: Request, res: Response): Promise<Response> => {
+userRouter.get('/', async (_: Request, res: Response): Promise<Response> => {
   return await UserService.getUsers(res);
 });
 

@@ -1,2 +1,2 @@
-export { addPokemon } from './addPokemon';
-export { getPokemon } from './getPokemon';
+export { addPokemonToDatabase as addPokemon } from './addPokemon';
+export { getPokemonById } from './getPokemon';
