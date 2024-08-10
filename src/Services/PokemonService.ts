@@ -3,6 +3,7 @@ import { PokemonModel } from '../Schemas/Pokemon';
 import { Pokemon } from '../Types/Pokemon';
 import { CacheManager } from './CacheManagerService';
 import { RedisService } from './RedisService';
+import { addPokemon, getPokemonById } from '../ORM/Pokemon';
 
 export class PokemonService {
   static async getPokemon(pokemonId: string): Promise<Pokemon | null> {
@@ -26,15 +27,14 @@ export class PokemonService {
     if (redisPokemon) {
       console.log(`[${this.name}] Pokemon ${redisPokemon.name} found in Redis`);
       CacheManager.movePokemonToFront(redisPokemon.id);
+      RedisService.checkPokemonMemory(redisPokemon.id);
       return redisPokemon;
     }
 
     console.log(`[${this.name}] Pokemon not found in Redis searching Mongo`);
-    const pokemon = await PokemonModel.findOne({ id: pokemonId });
+    const pokemon = await getPokemonById(pokemonId);
     if (pokemon) {
       const accessCount = CacheManager.updatePokemon(pokemonId);
-      const pokemonAccessCount = CacheManager.getPokemonAccessCount(pokemonId);
-      console.log(`[${this.name}] Pokemon access count: ${pokemonAccessCount}`);
       if (accessCount >= RedisService.REDIS_ACCESS_COUNT) {
         RedisService.addPokemon(redisKey, pokemon);
         CacheManager.addPokemonToList(pokemon);
@@ -49,8 +49,7 @@ export class PokemonService {
       .get(`https://pokeapi.co/api/v2/pokemon/${pokemonId}`)
       .then(async (response) => {
         const pokemonData: Pokemon = response.data;
-        const pokemon = await PokemonModel.create(pokemonData);
-        await pokemon.save();
+        await addPokemon(pokemonData);
         console.log(
           `[${this.name}] Pokemon with id ${pokemonId} added to Mongo`
         );

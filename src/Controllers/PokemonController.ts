@@ -1,17 +1,22 @@
 import { Request, Response, Router } from 'express';
-import { PokemonService } from '../Services/PokemonService';
+import { RestResponse } from '../Dto/RestResponse';
 import { StatusCodes } from '../Enums/statusCodes';
+import { PokemonService } from '../Services/PokemonService';
 
 export const pokemonRouter = Router();
 
 pokemonRouter.get('/:id', async (req: Request, res: Response) => {
-  const pokemonData = await PokemonService.getPokemon(req.params.id);
+  const pokemonId = req.params.id;
+  const pokemonData = await PokemonService.getPokemon(pokemonId);
 
-  // return RestResponse.Fail(
-  //   'Error fetching Pokemon from API',
-  //   StatusCodes.BAD_REQUEST,
-  //   [`Pokemon with id ${pokemonId} not found`],
-  //   res
-  // );
-  return res.status(StatusCodes.OK).send({ data: pokemonData });
+  if (!pokemonData) {
+    return RestResponse.Fail(
+      'Error fetching Pokemon from API',
+      StatusCodes.BAD_REQUEST,
+      [`Pokemon with id ${pokemonId} not found`],
+      res
+    );
+  }
+
+  return RestResponse.OkWithData('Pokemon found', pokemonData, res);
 });

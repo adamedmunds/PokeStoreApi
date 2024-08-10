@@ -1,6 +1,7 @@
 import { createClient } from 'redis';
 import { Pokemon } from '../Types/Pokemon';
 import { CacheManager } from './CacheManagerService';
+import { convertBytes } from '../Utils/convertBytes';
 
 export class RedisService {
   public static REDIS_ACCESS_COUNT = 4; // Number of times a pokemon is accessed before it is added to Redis
@@ -19,6 +20,7 @@ export class RedisService {
         CacheManager.setPokemonAccessCount(key.split(':')[1]);
       }
     }
+    console.log(`[${this.name}] ${keys.length} Pokemon loaded from Redis`);
   }
 
   static async createClient() {
@@ -72,6 +74,20 @@ export class RedisService {
   static async deletePokemon(key: string): Promise<void> {
     const client = await this.createClient();
     client.del(key).then(() => {
+      client.disconnect();
+    });
+  }
+
+  static async checkPokemonMemory(pokemonId: number): Promise<void> {
+    const client = await this.createClient();
+    client.MEMORY_USAGE(`pokemon:${pokemonId}`).then((data) => {
+      if (data) {
+        console.log(
+          `[${this.name}] Pokemon with id ${pokemonId} is using ${convertBytes(
+            data
+          )} (${data} bytes) of memory`
+        );
+      }
       client.disconnect();
     });
   }
