@@ -1,24 +1,27 @@
 import axios from 'axios';
-import { PokemonModel } from '../Schemas/Pokemon';
+import { NextFunction } from 'express';
+import { addPokemon, getPokemonById } from '../ORM/Pokemon';
 import { Pokemon } from '../Types/Pokemon';
 import { CacheManager } from './CacheManagerService';
 import { RedisService } from './RedisService';
-import { addPokemon, getPokemonById } from '../ORM/Pokemon';
 
 export class PokemonService {
-  static async getPokemon(pokemonId: string): Promise<Pokemon | null> {
+  static async getPokemon(
+    pokemonId: string,
+    next: NextFunction
+  ): Promise<Pokemon | null | void> {
     // TODO: add middlware for catching these errors
 
     if (!pokemonId) {
-      throw new Error(`[${this.name}] Pokemon id is required`);
+      return next(new Error(`[${this.name}] Pokemon id is required`));
     }
 
     if (isNaN(parseInt(pokemonId))) {
-      throw new Error(`[${this.name}] Pokemon id must be a number`);
+      return next(new Error(`[${this.name}] Pokemon id must be a number`));
     }
 
     if (parseInt(pokemonId) < 1) {
-      throw new Error(`[${this.name}] Pokemon id must be higher than 1`);
+      return next(new Error(`[${this.name}] Pokemon id must be higher than 1`));
     }
 
     const redisKey = `pokemon:${pokemonId}`;
