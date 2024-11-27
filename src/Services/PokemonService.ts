@@ -29,7 +29,6 @@ export class PokemonService {
     const redisPokemon = await RedisService.getPokemon(redisKey);
     if (redisPokemon) {
       console.log(`[${this.name}] Pokemon ${redisPokemon.name} found in Redis`);
-      CacheManager.movePokemonToFront(redisPokemon.id);
       RedisService.checkPokemonMemory(redisPokemon.id);
       return redisPokemon;
     }
@@ -37,16 +36,11 @@ export class PokemonService {
     console.log(`[${this.name}] Pokemon not found in Redis searching Mongo`);
     const pokemon = await getPokemonById(pokemonId);
     if (pokemon) {
-      const accessCount = CacheManager.updatePokemon(pokemonId);
-      if (accessCount >= RedisService.REDIS_ACCESS_COUNT) {
-        RedisService.addPokemon(redisKey, pokemon);
-        CacheManager.addPokemonToList(pokemon);
-        console.log(
-          `[${this.name}] Pokemon with id ${pokemonId} added to Redis`
-        );
-      }
+      RedisService.addPokemon(redisKey, pokemon);
+      console.log(`[${this.name}] Pokemon with id ${pokemonId} added to Redis`);
       return pokemon;
     }
+
     console.log(`[${this.name}] Pokemon not found in Mongo searching API`);
     return await axios
       .get(`https://pokeapi.co/api/v2/pokemon/${pokemonId}`)
@@ -56,7 +50,6 @@ export class PokemonService {
         console.log(
           `[${this.name}] Pokemon with id ${pokemonId} added to Mongo`
         );
-        CacheManager.updatePokemon(pokemonId);
         return pokemonData;
       })
       .catch((err) => {

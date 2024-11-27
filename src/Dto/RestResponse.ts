@@ -38,7 +38,7 @@ export class RestResponse {
     return this.Send(object);
   }
 
-  static OkWithData(message: string, data: any, res: Response): Response {
+  static OkWithData(message: string, data: object, res: Response): Response {
     const object = new RestResponse(
       message,
       StatusCodes.OK,

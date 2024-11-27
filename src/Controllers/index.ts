@@ -1,3 +1,2 @@
-export { userRouter } from './UserController';
-export { pokemonRouter } from './PokemonController';
 export { cacheRouter } from './CacheController';
+export { pokemonRouter } from './PokemonController';
