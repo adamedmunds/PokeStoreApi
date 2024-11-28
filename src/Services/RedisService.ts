@@ -1,15 +1,39 @@
+import { DefaultAzureCredential } from '@azure/identity';
 import { createClient } from 'redis';
 import { Pokemon } from '../Types/Pokemon';
 import { convertBytes } from '../Utils/convertBytes';
 
 export class RedisService {
   static async createClient() {
-    const client = createClient();
-    client
-      .on('error', (err) => {
-        console.log('Error ' + err);
-      })
-      .connect();
+    let client;
+    const redisUrl = `redis://${process.env.REDIS_URL}:${process.env.REDIS_PORT}`;
+
+    if (process.env.REDIS_ENVIRONMENT === 'azure') {
+      const credential = new DefaultAzureCredential();
+
+      // Fetch a Microsoft Entra token to be used for authentication. This token will be used as the password.
+      const accessToken = await credential.getToken(
+        'https://redis.azure.com/.default'
+      );
+
+      client = createClient({
+        username: process.env.AZURE_ACCOUNT_ID,
+        password: accessToken.token,
+        url: redisUrl,
+        pingInterval: 100000,
+        socket: {
+          tls: true,
+          keepAlive: 0,
+        },
+      });
+    } else {
+      client = createClient({
+        url: redisUrl,
+      });
+    }
+
+    client.on('error', (err) => console.log('Redis Client Error', err));
+    await client.connect();
 
     return client;
   }
