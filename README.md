@@ -50,7 +50,6 @@ To run the server, install the packages via `npm install` and then run `npm star
 
 <h2 id="todo-features">Features in Progress</h2>
 
-- Connect to external Mongo database
 - Provide more in-depth pokemon querying
   - Evolutions
   - Abilities
