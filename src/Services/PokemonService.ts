@@ -2,7 +2,6 @@ import axios from 'axios';
 import { NextFunction } from 'express';
 import { addPokemon, getPokemonById } from '../ORM/Pokemon';
 import { Pokemon } from '../Types/Pokemon';
-import { CacheManager } from './CacheManagerService';
 import { RedisService } from './RedisService';
 
 export class PokemonService {
