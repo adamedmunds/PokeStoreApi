@@ -10,3 +10,5 @@ export enum StatusCodes {
   INTERNAL_SERVER_ERROR = 500,
   SERVICE_UNAVAILABLE = 503,
 }
+
+export type StatusCodesType = keyof typeof StatusCodes;

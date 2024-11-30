@@ -2,6 +2,7 @@ import { NextFunction, Request, Response, Router } from 'express';
 import { RestResponse } from '../Dto/RestResponse';
 import { StatusCodes } from '../Enums/statusCodes';
 import { PokemonService } from '../Services/PokemonService';
+import axios from 'axios';
 
 export const pokemonRouter = Router();
 
@@ -9,15 +10,11 @@ pokemonRouter.get(
   '/:id',
   async (req: Request, res: Response, next: NextFunction) => {
     const pokemonId = req.params.id;
-    const pokemonData = await PokemonService.getPokemon(pokemonId, next);
+    const pokemonData = await PokemonService.getPokemon(pokemonId);
 
-    if (!pokemonData) {
-      return RestResponse.Fail(
-        'Error fetching Pokemon',
-        StatusCodes.BAD_REQUEST,
-        [`Pokemon with id ${pokemonId} not found`],
-        res
-      );
+    if (pokemonData instanceof Error) {
+      next(pokemonData);
+      return;
     }
 
     return RestResponse.OkWithData('Pokemon found', pokemonData, res);

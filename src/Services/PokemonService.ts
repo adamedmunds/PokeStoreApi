@@ -1,29 +1,55 @@
 import axios from 'axios';
-import { NextFunction } from 'express';
-import { addPokemon, getPokemonById } from '../ORM/Pokemon';
+import { ENDPOINTS } from '../Constants/Endpoints';
+import { POKEMON_NAMES, PokemonName } from '../Constants/Pokemon';
+import { POKEMON_IDS } from '../Constants/PokemonIds';
+import { RestError } from '../Errors/RestError';
+import { SingleRestError } from '../Errors/SingleRestError';
+import { addPokemonToDatabase, getPokemonById } from '../ORM/Pokemon';
 import { Pokemon } from '../Types/Pokemon';
 import { RedisService } from './RedisService';
 
 export class PokemonService {
-  static async getPokemon(
-    pokemonId: string,
-    next: NextFunction
-  ): Promise<Pokemon | null | void> {
-    // TODO: add middlware for catching these errors
-
-    if (!pokemonId) {
-      return next(new Error(`[${this.name}] Pokemon id is required`));
+  static async getPokemon(pokemonQuery: string): Promise<Pokemon | RestError> {
+    if (!pokemonQuery) {
+      return new SingleRestError(
+        'Request Error',
+        'BAD_REQUEST',
+        'Pokemon id is required'
+      );
     }
 
-    if (isNaN(parseInt(pokemonId))) {
-      return next(new Error(`[${this.name}] Pokemon id must be a number`));
+    if (isNaN(parseInt(pokemonQuery))) {
+      pokemonQuery = pokemonQuery.trim().replace(/\s+/g, '-').toLowerCase();
+
+      if (!(pokemonQuery in POKEMON_NAMES)) {
+        const closestMatch = Object.keys(POKEMON_NAMES).find(
+          (name) => name[0] === pokemonQuery[0] && name.includes(pokemonQuery)
+        );
+
+        let errorMessage = 'Could not find pokemon with name: ' + pokemonQuery;
+        if (closestMatch !== undefined) {
+          errorMessage += ', did you mean ' + closestMatch + '?';
+        }
+
+        return new SingleRestError(
+          'Request Error',
+          'BAD_REQUEST',
+          errorMessage
+        );
+      }
+
+      pokemonQuery = POKEMON_IDS[pokemonQuery as PokemonName].toString();
     }
 
-    if (parseInt(pokemonId) < 1) {
-      return next(new Error(`[${this.name}] Pokemon id must be higher than 1`));
+    if (parseInt(pokemonQuery) < 1) {
+      return new SingleRestError(
+        'Request Error',
+        'BAD_REQUEST',
+        'Pokemon id must be greater than 1'
+      );
     }
 
-    const redisKey = `pokemon:${pokemonId}`;
+    const redisKey = `pokemon:${pokemonQuery}`;
 
     const redisPokemon = await RedisService.getPokemon(redisKey);
     if (redisPokemon) {
@@ -33,29 +59,47 @@ export class PokemonService {
     }
 
     console.log(`[${this.name}] Pokemon not found in Redis searching Mongo`);
-    const pokemon = await getPokemonById(pokemonId);
+    const pokemon = await getPokemonById(pokemonQuery);
     if (pokemon) {
-      RedisService.addPokemon(redisKey, pokemon);
-      console.log(`[${this.name}] Pokemon with id ${pokemonId} added to Redis`);
+      await this.addRedisPokemon(redisKey, pokemon);
+      console.log(
+        `[${this.name}] Pokemon with id ${pokemonQuery} added to Redis`
+      );
       return pokemon;
     }
 
     console.log(`[${this.name}] Pokemon not found in Mongo searching API`);
+    return await this.getPokemonFromApi(pokemonQuery);
+  }
+
+  private static async getPokemonFromApi(
+    pokemonId: string
+  ): Promise<Pokemon | RestError> {
     return await axios
-      .get(`https://pokeapi.co/api/v2/pokemon/${pokemonId}`)
+      .get(`${ENDPOINTS.POKEMON}${pokemonId}`)
       .then(async (response) => {
         const pokemonData: Pokemon = response.data;
-        await addPokemon(pokemonData);
+        await addPokemonToDatabase(pokemonData);
         console.log(
           `[${this.name}] Pokemon with id ${pokemonId} added to Mongo`
         );
+        await this.addRedisPokemon(`pokemon:${pokemonId}`, pokemonData);
         return pokemonData;
       })
-      .catch((err) => {
-        console.log(err);
-        throw new Error(
-          `[${this.name}] Pokemon with id ${pokemonId} not found`
+      .catch(() => {
+        return new SingleRestError(
+          'Request Error',
+          'NOT_FOUND',
+          `Pokemon with id ${pokemonId} not found`
         );
       });
+  }
+
+  private static async addRedisPokemon(
+    key: string,
+    pokemon: Pokemon
+  ): Promise<void> {
+    await RedisService.addPokemon(key, pokemon);
+    console.log(`[${this.name}] Pokemon with id ${pokemon.id} added to Redis`);
   }
 }
