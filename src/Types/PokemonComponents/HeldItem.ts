@@ -1,7 +1,7 @@
-import { GenericApiResponse } from './GenericApiResponse';
-import { HeldItemVersion } from './HeldItemVersion';
+import { NamedApiResource } from './GenericApiResponse';
+import { PokemonHeldItemVersion } from './HeldItemVersion';
 
-export type HeldItem = {
-  item: GenericApiResponse;
-  version_details: Array<HeldItemVersion>;
+export type PokemonHeldItem = {
+  item: NamedApiResource;
+  version_details: Array<PokemonHeldItemVersion>;
 };

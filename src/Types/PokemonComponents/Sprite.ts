@@ -1,4 +1,4 @@
-export type Sprite = {
+export type PokemonSprites = {
   front_default: string;
   front_shiny: string | null;
   front_female: string | null;

@@ -1,7 +1,7 @@
-import { GenericApiResponse } from './GenericApiResponse';
+import { NamedApiResource } from './GenericApiResponse';
 
-export type Stat = {
-  stat: GenericApiResponse;
+export type PokemonStat = {
+  stat: NamedApiResource;
   effort: number;
   base_stat: number;
 };

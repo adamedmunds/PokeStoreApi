@@ -1,4 +1,4 @@
-export type GenericApiResponse = {
+export type NamedApiResource = {
   name: string;
   url: string;
 };

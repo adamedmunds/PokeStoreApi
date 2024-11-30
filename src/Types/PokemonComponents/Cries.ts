@@ -1,4 +1,4 @@
-export type Cries = {
+export type PokemonCries = {
   latest: string;
   legacy: string;
 };

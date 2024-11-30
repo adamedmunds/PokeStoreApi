@@ -1,6 +1,6 @@
-import { GenericApiResponse } from './GenericApiResponse';
+import { NamedApiResource } from './GenericApiResponse';
 
-export type GameIndex = {
+export type VersionGameIndex = {
   game_index: number;
-  version: GenericApiResponse;
+  version: NamedApiResource;
 };

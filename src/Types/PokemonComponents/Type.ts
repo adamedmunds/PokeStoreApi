@@ -1,6 +1,6 @@
-import { GenericApiResponse } from './GenericApiResponse';
+import { NamedApiResource } from './GenericApiResponse';
 
 export type PokemonType = {
   slot: number;
-  type: GenericApiResponse;
+  type: NamedApiResource;
 };

@@ -1,7 +1,7 @@
-import { GenericApiResponse } from './GenericApiResponse';
+import { NamedApiResource } from './GenericApiResponse';
 import { PokemonMoveVersion } from './MoveVersion';
 
 export type PokemonMove = {
-  move: GenericApiResponse;
+  move: NamedApiResource;
   version_group_details: Array<PokemonMoveVersion>;
 };

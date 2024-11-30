@@ -1,7 +1,7 @@
-import { GenericApiResponse } from './GenericApiResponse';
+import { NamedApiResource } from './GenericApiResponse';
 import { PokemonType } from './Type';
 
-export type PastType = {
-  generation: GenericApiResponse;
+export type PokemonTypePast = {
+  generation: NamedApiResource;
   types: Array<PokemonType>;
 };
